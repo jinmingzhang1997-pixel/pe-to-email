@@ -12,74 +12,43 @@ API_KEY = "TOJRJ2NRZ6CWOKFV"
 
 SYMBOL = "QQQ"
 
-def fetch_pe():
-    url = f"https://www.alphavantage.co/query?function=OVERVIEW&symbol=QQQ&apikey={API_KEY}"
+def get_prices():
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{SYMBOL}?range=1y&interval=1d"
     data = requests.get(url).json()
 
-    print("DEBUG RESPONSE:", data)
+    result = data["chart"]["result"][0]
+    prices = result["indicators"]["quote"][0]["close"]
 
-    pe = data.get("PERatio")
-    if not pe:
-        return None, None, None, None
+    prices = [p for p in prices if p is not None]
+    return prices
 
-    pe = float(pe)
+def calc_percentile(prices):
+    current = prices[-1]
+    return round((np.array(prices) < current).mean() * 100, 2)
 
-    # 分位判断（简化版）
-    if pe > 30:
-        level = "高估（约70%+）"
-        advice = "少投"
-    elif pe > 25:
-        level = "偏高"
-        advice = "正常或少投"
-    elif pe < 20:
-        level = "低估"
-        advice = "多投"
-    else:
-        level = "正常"
-        advice = "定投"
-
-    return pe, level, advice, datetime.now().strftime("%Y-%m-%d")
-
-def send_email(content):
-    from email.mime.text import MIMEText
-    from email.header import Header
-    import smtplib
-
-    global SENDER_EMAIL, GMAIL_APP_PASSWORD
-
-    # 强制清洗
-    SENDER_EMAIL = SENDER_EMAIL.strip()
-    GMAIL_APP_PASSWORD = GMAIL_APP_PASSWORD.replace(" ", "").strip()
-
-    msg = MIMEText(content, "plain", "utf-8")
-    msg["Subject"] = Header("纳指100估值日报", "utf-8")
-    msg["From"] = SENDER_EMAIL
-    msg["To"] = RECEIVER_EMAIL
-
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(SENDER_EMAIL, GMAIL_APP_PASSWORD)
-        server.send_message(msg)
+def get_advice(pct):
+    if pct > 75:
+        return "高位：少投"
+    elif pct < 30:
+        return "低位：多投"
+    return "正常：定投"
 
 def main():
-    pe, level, advice, date = fetch_pe()
+    prices = get_prices()
+    pct = calc_percentile(prices)
+    advice = get_advice(pct)
 
-    if pe is None:
-        content = "❌ 获取数据失败"
-    else:
-        content = f"""
-📊 纳指100估值日报（QQQ）
+    content = f"""
+纳指100（QQQ）定投信号
 
-日期：{date}
-PE：{pe}
+日期：{datetime.now().strftime('%Y-%m-%d')}
 
-估值：{level}
+价格分位：{pct}%
+
 建议：{advice}
-
-说明：
-使用QQQ代替纳指100
 """
 
-    send_email(content)
+    print(content)
 
 if __name__ == "__main__":
     main()
