@@ -4,10 +4,10 @@ import smtplib
 from email.mime.text import MIMEText
 
 # ====== 填你自己的 ======
-SENDER_EMAIL = "你的gmail@gmail.com"
-RECEIVER_EMAIL = "你的gmail@gmail.com"
-GMAIL_APP_PASSWORD = "你的应用密码"
-API_KEY = "你的AlphaVantageKey"
+SENDER_EMAIL = "jinmingzhang1997@gmail.com"
+RECEIVER_EMAIL = "jinmingzhang1997@gmail.com"
+GMAIL_APP_PASSWORD = "xoddgfuthhvwbdan"
+API_KEY = "TOJRJ2NRZ6CWOKFV"
 # =======================
 
 SYMBOL = "QQQ"
