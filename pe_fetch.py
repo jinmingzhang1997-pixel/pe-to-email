@@ -40,9 +40,10 @@ def fetch_pe():
 
 def send_email(content):
     msg = MIMEText(content, "plain", "utf-8")
-    msg["Subject"] = "纳指100估值日报"
-    msg["From"] = SENDER_EMAIL
-    msg["To"] = RECEIVER_EMAIL
+    from email.header import Header
+    msg["Subject"] = Header("纳指100估值日报", "utf-8")
+    msg["From"] = Header(SENDER_EMAIL, "utf-8")
+    msg["To"] = Header(RECEIVER_EMAIL, "utf-8")
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(SENDER_EMAIL, GMAIL_APP_PASSWORD)
