@@ -13,8 +13,10 @@ API_KEY = "TOJRJ2NRZ6CWOKFV"
 SYMBOL = "QQQ"
 
 def fetch_pe():
-    url = f"https://www.alphavantage.co/query?function=OVERVIEW&symbol={SYMBOL}&apikey={API_KEY}"
+    url = f"https://www.alphavantage.co/query?function=OVERVIEW&symbol=QQQ&apikey={API_KEY}"
     data = requests.get(url).json()
+
+    print("DEBUG RESPONSE:", data)
 
     pe = data.get("PERatio")
     if not pe:
