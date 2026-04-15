@@ -39,11 +39,20 @@ def fetch_pe():
     return pe, level, advice, datetime.now().strftime("%Y-%m-%d")
 
 def send_email(content):
-    msg = MIMEText(content, "plain", "utf-8")
+    from email.mime.text import MIMEText
     from email.header import Header
+    import smtplib
+
+    global SENDER_EMAIL, GMAIL_APP_PASSWORD
+
+    # 强制清洗
+    SENDER_EMAIL = SENDER_EMAIL.strip()
+    GMAIL_APP_PASSWORD = GMAIL_APP_PASSWORD.replace(" ", "").strip()
+
+    msg = MIMEText(content, "plain", "utf-8")
     msg["Subject"] = Header("纳指100估值日报", "utf-8")
-    msg["From"] = Header(SENDER_EMAIL, "utf-8")
-    msg["To"] = Header(RECEIVER_EMAIL, "utf-8")
+    msg["From"] = SENDER_EMAIL
+    msg["To"] = RECEIVER_EMAIL
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(SENDER_EMAIL, GMAIL_APP_PASSWORD)
